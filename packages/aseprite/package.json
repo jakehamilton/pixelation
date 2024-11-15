@@ -1,0 +1,44 @@
+{
+    "name": "@pixelation/aseprite",
+    "version": "1.0.0",
+    "description": "A library for parsing Aseprite files.",
+    "files": [
+        "dist/**/*",
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "npm run build:lib && npm run build:types",
+        "build:lib": "vite build",
+        "build:types": "tsc -p . --emitDeclarationOnly",
+        "test": "node test/index.js"
+    },
+    "keywords": [
+        "aseprite",
+        "pixel",
+        "art",
+        "ase",
+        "parse"
+    ],
+    "author": "Jake Hamilton <jake.hamilton@hey.com>",
+    "license": "Apache-2.0",
+    "exports": {
+        ".": {
+            "import": "./dist/bundle.es.mjs",
+            "require": "./dist/bundle.cjs.js",
+            "default": "./dist/bundle.umd.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "main": "./dist/bundle.cjs.js",
+    "types": "./dist/index.d.ts",
+    "devDependencies": {
+        "vite": "^5.4.11",
+        "typescript": "^5.6.3",
+        "@types/pako": "^2.0.3"
+    },
+    "dependencies": {
+        "pako": "^2.1.0"
+    }
+}
