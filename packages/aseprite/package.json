@@ -11,8 +11,7 @@
     "scripts": {
         "build": "npm run build:lib && npm run build:types",
         "build:lib": "vite build",
-        "build:types": "tsc -p . --emitDeclarationOnly",
-        "test": "node test/index.js"
+        "build:types": "tsc -p . --emitDeclarationOnly"
     },
     "keywords": [
         "aseprite",
