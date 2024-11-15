@@ -42,5 +42,13 @@
     },
     "dependencies": {
         "pako": "^2.1.0"
+    },
+    "homepage": "https://github.com/jakehamilton/pixelation",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jakehamilton/pixelation.git"
+    },
+    "bugs": {
+        "url": "https://github.com/jakehamilton/pixelation/issues"
     }
 }
