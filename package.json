@@ -8,6 +8,8 @@
     "scripts": {
         "build": "titan run build",
         "build:changed": "titan run build --changed",
+        "bootstrap": "titan install --no-save",
+        "bootstrap:changed": "titan install --no-save --changed",
         "publish": "titan publish"
     },
     "titan": {
