@@ -13,6 +13,9 @@
         "build:lib": "vite build",
         "build:types": "tsc -p . --emitDeclarationOnly"
     },
+    "publishConfig": {
+        "access": "public"
+    },
     "keywords": [
         "aseprite",
         "pixel",
