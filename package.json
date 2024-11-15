@@ -10,6 +10,8 @@
         "build:changed": "titan run build --changed",
         "bootstrap": "titan install --no-save",
         "bootstrap:changed": "titan install --no-save --changed",
+        "test": "titan run test",
+        "test:changed": "titan run test --changed",
         "publish": "titan publish"
     },
     "titan": {
