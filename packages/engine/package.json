@@ -1,0 +1,54 @@
+{
+    "name": "@pixelation/engine",
+    "version": "1.0.0",
+    "description": "A simple pixel art game engine.",
+    "files": [
+        "dist/**/*",
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "npm run build:lib && npm run build:types",
+        "build:lib": "vite build",
+        "build:types": "tsc -p . --emitDeclarationOnly",
+        "dev": "vite dev --host"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "pixel",
+        "art",
+        "game",
+        "engine"
+    ],
+    "author": "Jake Hamilton <jake.hamilton@hey.com>",
+    "license": "Apache-2.0",
+    "exports": {
+        ".": {
+            "import": "./dist/bundle.es.mjs",
+            "require": "./dist/bundle.cjs.js",
+            "default": "./dist/bundle.umd.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "main": "./dist/bundle.cjs.js",
+    "types": "./dist/index.d.ts",
+    "devDependencies": {
+        "vite": "^5.4.11",
+        "typescript": "^5.6.3",
+        "vite-plugin-arraybuffer": "^0.0.8"
+    },
+    "dependencies": {
+        "@pixelation/aseprite": "^1.0.0"
+    },
+    "homepage": "https://github.com/jakehamilton/pixelation",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jakehamilton/pixelation.git"
+    },
+    "bugs": {
+        "url": "https://github.com/jakehamilton/pixelation/issues"
+    }
+}
