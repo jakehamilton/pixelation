@@ -6,8 +6,8 @@
     "license": "",
     "private": true,
     "scripts": {
-        "build": "titan run build",
-        "build:changed": "titan run build --changed",
+        "build": "titan run build -o",
+        "build:changed": "titan run build --changed -o",
         "bootstrap": "titan install --no-save",
         "bootstrap:changed": "titan install --no-save --changed",
         "test": "titan run test",
