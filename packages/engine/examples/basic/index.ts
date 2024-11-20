@@ -3,12 +3,13 @@ import * as engine from "../../src";
 import rgbaSpriteBuffer from "./sprites/rgba.aseprite?arraybuffer";
 import grayscaleSpriteBuffer from "./sprites/grayscale.aseprite?arraybuffer";
 import indexedSpriteBuffer from "./sprites/indexed.aseprite?arraybuffer";
+import animatedSpriteBuffer from "./sprites/animated.aseprite?arraybuffer";
 
 import sfxBuffer from "./audio/sfx.wav?arraybuffer";
 import musicBuffer from "./audio/music.wav?arraybuffer";
 
 const root = document.getElementById("root")!;
-const screen = new engine.graphics.Screen(300, 300);
+const screen = new engine.graphics.Screen(100, 100);
 
 const rgbaSprite = engine.graphics.Sprite.fromArrayBuffer(rgbaSpriteBuffer);
 const grayscaleSprite = engine.graphics.Sprite.fromArrayBuffer(
@@ -16,6 +17,8 @@ const grayscaleSprite = engine.graphics.Sprite.fromArrayBuffer(
 );
 const indexedSprite =
     engine.graphics.Sprite.fromArrayBuffer(indexedSpriteBuffer);
+const animatedSprite =
+    engine.graphics.AnimatedSprite.fromArrayBuffer(animatedSpriteBuffer);
 
 let playerX = engine.easing.smooth(screen.width / 2, 0.5, 0.5, 2);
 let playerY = engine.easing.smooth(screen.height / 2, 0.5, 0.5, 2);
@@ -61,11 +64,13 @@ const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
     });
 };
 
-const update: engine.lifecycle.Update = (surface, inputs, audio) => {
+const update: engine.lifecycle.Update = (surface, inputs, audio, dt) => {
     const gamepad = inputs.gamepads[0];
 
     const x = playerX();
     const y = playerY();
+
+    let isMoving = false;
 
     if (
         inputs.keyboard.held("w") ||
@@ -73,6 +78,7 @@ const update: engine.lifecycle.Update = (surface, inputs, audio) => {
         gamepad.held(UP_BUTTON) ||
         gamepad.axis(LEFT_STICK_Y) < 0 - STICK_SENSITIVITY
     ) {
+        isMoving = true;
         playerY(y - 1);
     }
 
@@ -82,6 +88,7 @@ const update: engine.lifecycle.Update = (surface, inputs, audio) => {
         gamepad.held(DOWN_BUTTON) ||
         gamepad.axis(LEFT_STICK_Y) > 0 + STICK_SENSITIVITY
     ) {
+        isMoving = true;
         playerY(y + 1);
     }
 
@@ -91,6 +98,7 @@ const update: engine.lifecycle.Update = (surface, inputs, audio) => {
         gamepad.held(LEFT_BUTTON) ||
         gamepad.axis(LEFT_STICK_X) < 0 - STICK_SENSITIVITY
     ) {
+        isMoving = true;
         playerX(x - 1);
     }
 
@@ -100,7 +108,16 @@ const update: engine.lifecycle.Update = (surface, inputs, audio) => {
         gamepad.held(RIGHT_BUTTON) ||
         gamepad.axis(LEFT_STICK_X) > 0 + STICK_SENSITIVITY
     ) {
+        isMoving = true;
         playerX(x + 1);
+    }
+
+    if (isMoving) {
+        console.log("play");
+        animatedSprite.play();
+    } else {
+        console.log("pause");
+        animatedSprite.pause();
     }
 
     if (inputs.keyboard.pressed("Space")) {
@@ -114,6 +131,7 @@ const update: engine.lifecycle.Update = (surface, inputs, audio) => {
     // 		console.log("held", i);
     // 	}
     // }
+    animatedSprite.update(dt);
 };
 
 const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
@@ -388,23 +406,6 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
             [1, 0, 0],
             [0, 1, 0],
             [0, 0, 1],
-        ]).translate(-size / 2, -size / 2);
-
-        screen.fillCirc(
-            Math.floor(playerX()),
-            Math.floor(playerY()),
-            size,
-            engine.colors.fromHsl(0.65, 0.9, 0.75),
-            transform
-        );
-    })();
-
-    (() => {
-        const size = 2;
-        const transform = new engine.geometry.Matrix3([
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
         ]).translate(-size / 2 + 1, -size / 2 + 1);
 
         if (inputs.mouse.visible) {
@@ -416,6 +417,23 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
                 transform
             );
         }
+    })();
+
+    (() => {
+        const x = playerX();
+        const y = playerY();
+        const transform = new engine.geometry.Matrix3([
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+        ])
+            .translate(
+                -x - animatedSprite.width / 2,
+                -y - animatedSprite.height / 2
+            )
+            .translate(x, y);
+
+        animatedSprite.render(surface, playerX(), playerY(), transform);
     })();
 };
 

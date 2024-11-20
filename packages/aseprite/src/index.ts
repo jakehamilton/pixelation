@@ -287,6 +287,27 @@ export enum AsepriteFileChunkType {
     Embedded = 2,
 }
 
+export enum AsepriteTagAnimationDirection {
+    Forward = 0,
+    Reverse = 1,
+    PingPong = 2,
+    PingPongReverse = 3,
+}
+
+export interface AsepriteTag {
+    from: AsepriteSignedInt16;
+    to: AsepriteSignedInt16;
+    direction: AsepriteTagAnimationDirection;
+    repeat: AsepriteSignedInt16;
+    color: AsepriteRgbaPixel;
+    name: string;
+}
+
+export interface AsepriteFileTagsChunk extends AsepriteFileChunkBase {
+    kind: AsepriteFileChunkKind.Tags;
+    tags: Array<AsepriteTag>;
+}
+
 interface AsepriteFileColorProfileChunkBase {
     kind: AsepriteFileChunkKind.ColorProfile;
     flags: AsepriteFlags;
@@ -416,7 +437,8 @@ export type AsepriteFileChunk =
     | AsepriteFileCelChunk
     | AsepriteFileColorProfileChunk
     | AsepriteFilePaletteChunk
-    | AsepriteFileUserDataChunk;
+    | AsepriteFileUserDataChunk
+    | AsepriteFileTagsChunk;
 
 // Parsed data
 // ================================================
@@ -457,7 +479,8 @@ export class Aseprite {
     private data: DataView;
 
     public header: AsepriteFileHeader;
-    public frames: AsepriteFrame[] = [];
+    public frames: AsepriteFrame[];
+    public tags: AsepriteTag[] = [];
     public palette: Record<
         number | string,
         Omit<AsepritePaletteEntry, "flags" | "name">
@@ -576,16 +599,16 @@ export class Aseprite {
     }
 
     private parseFrames(): AsepriteFrame[] {
-        const frames = [];
+        const frames: AsepriteFrame[] = [];
 
         for (let i = 0; i < this.header.frames; i++) {
-            frames.push(this.parseFrame());
+            frames.push(this.parseFrame(frames));
         }
 
         return frames;
     }
 
-    private parseFrame() {
+    private parseFrame(frames: AsepriteFrame[]) {
         /**
          * DWORD       Bytes in this frame
          * WORD        Magic number (always 0xF1FA)
@@ -624,7 +647,18 @@ export class Aseprite {
             userdata: {},
         };
 
-        let last: AsepriteFrame | AsepriteLayer | AsepriteCel = frame;
+        if (frames.length > 0) {
+            const first = frames[0];
+
+            for (const layer of first.layers) {
+                frame.layers.push({
+                    ...layer,
+                    cels: [],
+                });
+            }
+        }
+
+        let last: AsepriteFrame | AsepriteLayer | AsepriteCel | null = frame;
         let layer: AsepriteLayer | null = null;
 
         for (let i = 0; i < totalChunks; i++) {
@@ -684,11 +718,16 @@ export class Aseprite {
                         };
                         last = cel;
                         if (!frame.layers[chunk.layer]) {
-                            throw new Error("Cel found without a layer");
+                            console.error("Cel found without a layer");
+                            break;
                         }
                         frame.layers[chunk.layer].cels.push(cel);
                         break;
                     case AsepriteFileChunkKind.UserData:
+                        if (last === null) {
+                            break;
+                        }
+
                         if (chunk.flags & 1) {
                             last.userdata._text = (
                                 chunk as AsepriteFileUserDataChunkText
@@ -705,6 +744,12 @@ export class Aseprite {
                                 ...(chunk as AsepriteFileUserDataChunkMap).data,
                             };
                         }
+                        break;
+                    case AsepriteFileChunkKind.Tags:
+                        this.tags.push(
+                            ...(chunk as AsepriteFileTagsChunk).tags
+                        );
+                        last = null;
                         break;
                 }
             }
@@ -737,6 +782,8 @@ export class Aseprite {
                 return this.parsePalette();
             case AsepriteFileChunkKind.UserData:
                 return this.parseUserData();
+            case AsepriteFileChunkKind.Tags:
+                return this.parseTags();
             default:
                 console.warn(
                     `Skipping unsupported Aseprite chunk: ${
@@ -1284,6 +1331,101 @@ export class Aseprite {
         }
 
         throw new Error(`Unsupported user data type: 0x${type.toString(16)}`);
+    }
+
+    parseTags(): AsepriteFileTagsChunk {
+        /**
+         * WORD        Number of tags
+         * BYTE[8]     For future (set to zero)
+         * + For each tag
+         *   WORD      From frame
+         *   WORD      To frame
+         *   BYTE      Loop animation direction
+         *               0 = Forward
+         *               1 = Reverse
+         *               2 = Ping-pong
+         *               3 = Ping-pong Reverse
+         *   WORD      Repeat N times. Play this animation section N times:
+         *               0 = Doesn't specify (plays infinite in UI, once on export,
+         *                   for ping-pong it plays once in each direction)
+         *               1 = Plays once (for ping-pong, it plays just in one direction)
+         *               2 = Plays twice (for ping-pong, it plays once in one direction,
+         *                   and once in reverse)
+         *               n = Plays N times
+         *   BYTE[6]   For future (set to zero)
+         *   BYTE[3]   RGB values of the tag color
+         *               Deprecated, used only for backward compatibility with Aseprite v1.2.x
+         *               The color of the tag is the one in the user data field following
+         *               the tags chunk
+         *   BYTE      Extra byte (zero)
+         *   STRING    Tag name
+         */
+        const count = this.readUnsignedInt16();
+
+        this.readBytes(8);
+
+        const tags: AsepriteFileTagsChunk["tags"] = [];
+
+        for (let i = 0; i < count; i++) {
+            const from = this.readSignedInt16();
+            const to = this.readSignedInt16();
+            const direction = this.readByte() as AsepriteTagAnimationDirection;
+            const repeat = this.readSignedInt16();
+
+            this.readBytes(6); // Future
+
+            const r = this.readByte();
+            const g = this.readByte();
+            const b = this.readByte();
+
+            this.readByte(); //
+
+            const name = this.readString();
+
+            tags.push({
+                from,
+                to,
+                direction,
+                repeat,
+                color: [r, g, b, 255 as AsepriteByte],
+                name,
+            });
+        }
+
+        const cursor = this.cursor;
+
+        // Tags may be followed by user data for each tag.
+        for (let i = 0; i < count; i++) {
+            const tag = tags[i];
+
+            const _size = this.readSignedInt32();
+            const type = this.readSignedInt16();
+
+            if (type === AsepriteFileChunkKind.UserData) {
+                const userdata = this.parseUserData();
+
+                if (userdata.flags & 2) {
+                    const color = (userdata as AsepriteFileUserDataChunkColor)
+                        .color;
+
+                    tag.color = [
+                        color.red,
+                        color.green,
+                        color.blue,
+                        color.alpha,
+                    ];
+                }
+            } else {
+                break;
+            }
+        }
+
+        this.cursor = cursor;
+
+        return {
+            kind: AsepriteFileChunkKind.Tags,
+            tags,
+        };
     }
 
     // Helpers for consuming data from the file.

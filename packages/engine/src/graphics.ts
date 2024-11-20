@@ -1,6 +1,7 @@
-import { Aseprite } from "@pixelation/aseprite";
+import { Aseprite, AsepriteTagAnimationDirection } from "@pixelation/aseprite";
 import { fromAsepritePixel, Color, PackedColor, unpack, pack } from "./colors";
 import { isPointInTri, Matrix3, Rect } from "./geometry";
+import { DeltaTime } from "./lifecycle";
 
 export type Surface = Screen | VirtualScreen;
 
@@ -772,5 +773,165 @@ export class Sprite {
                 }
             }
         }
+    }
+}
+
+export class AnimatedSprite extends Sprite {
+    // @ts-expect-error
+    image: ImageData;
+
+    duration = 0;
+
+    start: number;
+    end: number;
+
+    animation?: string;
+    direction: AsepriteTagAnimationDirection =
+        AsepriteTagAnimationDirection.Forward;
+    repeat: number = 0;
+    iterations = 0;
+    playing = false;
+
+    constructor(
+        public asset: Aseprite,
+        public frame = 0,
+        public subregion: Rect = {
+            x: 0,
+            y: 0,
+            width: asset.width,
+            height: asset.height,
+        }
+    ) {
+        super(asset, frame, subregion);
+
+        this.start = 0;
+        this.end = asset.frames.length - 1;
+    }
+
+    static fromArrayBuffer(arrayBuffer: ArrayBuffer) {
+        const aseprite = new Aseprite(arrayBuffer);
+
+        return new AnimatedSprite(aseprite);
+    }
+
+    get width() {
+        return this.subregion.width;
+    }
+
+    get height() {
+        return this.subregion.height;
+    }
+
+    pause() {
+        this.playing = false;
+    }
+
+    play() {
+        this.playing = true;
+    }
+
+    setAnimation(animation?: string) {
+        this.playing = true;
+        this.iterations = 0;
+        this.duration = 0;
+        this.animation = animation;
+
+        if (animation) {
+            const tag = this.asset.tags.find((tag) => tag.name === animation);
+
+            if (tag) {
+                if (
+                    tag.direction === AsepriteTagAnimationDirection.Reverse ||
+                    tag.direction ===
+                        AsepriteTagAnimationDirection.PingPongReverse
+                ) {
+                    this.frame = tag.to;
+                } else {
+                    this.frame = tag.from;
+                }
+
+                this.start = tag.from;
+                this.end = tag.to;
+
+                this.direction = tag.direction;
+                this.repeat = tag.repeat;
+            } else {
+                console.error(`Animation ${animation} does not exist.`);
+            }
+        } else {
+            this.start = 0;
+            this.end = this.asset.frames.length - 1;
+        }
+    }
+
+    update(dt: DeltaTime = 0 as DeltaTime) {
+        this.duration += dt;
+
+        while (this.duration >= this.asset.frames[this.frame].duration) {
+            this.duration -= this.asset.frames[this.frame].duration;
+
+            if (
+                !this.playing ||
+                (this.repeat !== 0 && this.iterations >= this.repeat)
+            ) {
+                continue;
+            }
+
+            switch (this.direction) {
+                case AsepriteTagAnimationDirection.Forward:
+                    this.frame++;
+
+                    if (this.frame > this.end) {
+                        this.iterations++;
+                        this.frame = this.start;
+                    }
+                    break;
+                case AsepriteTagAnimationDirection.Reverse:
+                    this.frame--;
+
+                    if (this.frame < this.start) {
+                        this.iterations++;
+                        this.frame = this.end;
+                    }
+                    break;
+                case AsepriteTagAnimationDirection.PingPong:
+                    if (this.iterations % 2 === 0) {
+                        this.frame++;
+
+                        if (this.frame > this.end) {
+                            this.iterations++;
+                            this.frame = this.end;
+                        }
+                    } else {
+                        this.frame--;
+
+                        if (this.frame < this.start) {
+                            this.iterations++;
+                            this.frame = this.start;
+                        }
+                    }
+                    break;
+                case AsepriteTagAnimationDirection.PingPongReverse:
+                    if (this.iterations % 2 !== 0) {
+                        this.frame++;
+
+                        if (this.frame > this.end) {
+                            this.iterations++;
+                            this.frame = this.end;
+                        }
+                    } else {
+                        this.frame--;
+
+                        if (this.frame < this.start) {
+                            this.iterations++;
+                            this.frame = this.start;
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        super.update();
     }
 }
