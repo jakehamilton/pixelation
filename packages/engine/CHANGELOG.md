@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.1
+
+### Fixes
+
+- stop playing animation if repeat count is exceeded
+
 ## 1.1.0
 
 ### Features
