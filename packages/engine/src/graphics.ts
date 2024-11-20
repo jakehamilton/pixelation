@@ -870,10 +870,12 @@ export class AnimatedSprite extends Sprite {
         while (this.duration >= this.asset.frames[this.frame].duration) {
             this.duration -= this.asset.frames[this.frame].duration;
 
-            if (
-                !this.playing ||
-                (this.repeat !== 0 && this.iterations >= this.repeat)
-            ) {
+            if (!this.playing) {
+                continue;
+            }
+
+            if (this.repeat !== 0 && this.iterations >= this.repeat) {
+                this.playing = false;
                 continue;
             }
 
