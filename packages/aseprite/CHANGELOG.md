@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.0
+
+### Features
+
+- add support for animated sprites with tags
+
 ## 1.1.0
 
 ### Features
