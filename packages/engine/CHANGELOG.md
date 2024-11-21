@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.0
+
+### Features
+
+- expand easing functions
+
 ## 1.2.0
 
 ### Features
