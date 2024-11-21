@@ -27,6 +27,9 @@ let playerY = engine.easing.smooth(screen.height / 2, 0.95, 0.2, 5);
 let mouseX = engine.easing.smooth(screen.width / 2, 0.53, 0.3);
 let mouseY = engine.easing.smooth(screen.height / 2, 0.53, 0.3);
 
+let discX = 0;
+let discY = 0;
+
 const UP_BUTTON = 12;
 const DOWN_BUTTON = 13;
 const LEFT_BUTTON = 14;
@@ -137,6 +140,9 @@ const update: engine.lifecycle.Update = (surface, inputs, audio, dt) => {
 	mouseX(inputs.mouse.x);
 	mouseY(inputs.mouse.y);
 
+	discX = engine.easing.lerpSmooth(discX, inputs.mouse.x, 0.008, dt);
+	discY = engine.easing.lerpSmooth(discY, inputs.mouse.y, 0.008, dt);
+
 	// for (let i = 0; i < inputs.gamepads[0].buttons.length; i++) {
 	// 	const button = inputs.gamepads[0].buttons[i];
 	//
@@ -226,8 +232,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 
 	(() => {
 		const rotation = ((t % 2_000) / 2_000) * (Math.PI * 2);
-		const base = 10;
-		const height = 10;
+		const base = 11;
+		const height = 11;
 		const x = surface.width / 2;
 		const y = surface.height / 2;
 		const transform = new engine.geometry.Matrix3([
@@ -235,7 +241,7 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			[0, 1, 0],
 			[0, 0, 1],
 		])
-			.translate(-x, -y)
+			.translate(-x, -y - 1)
 			.rotate(rotation)
 			.translate(x, y);
 
@@ -421,10 +427,27 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			[0, 0, 1],
 		]).translate(-size / 2 + 1, -size / 2 + 1);
 
+		screen.fillCirc(
+			Math.round(discX),
+			Math.round(discY),
+			size,
+			engine.colors.fromHsl(0.45, 0.9, 0.75),
+			transform
+		);
+	})();
+
+	(() => {
+		const size = 2;
+		const transform = new engine.geometry.Matrix3([
+			[1, 0, 0],
+			[0, 1, 0],
+			[0, 0, 1],
+		]).translate(-size / 2 + 1, -size / 2 + 1);
+
 		if (inputs.mouse.visible) {
 			screen.fillCirc(
-				Math.round(mouseX()),
-				Math.round(mouseY()),
+				Math.round(inputs.mouse.x),
+				Math.round(inputs.mouse.y),
 				size,
 				engine.colors.fromHsl(0.85, 0.9, 0.75),
 				transform
