@@ -54,6 +54,26 @@ export class Screen {
 		this.image.data[index + 3] = a;
 	}
 
+	pixelUnpacked(
+		x: number,
+		y: number,
+		r: number,
+		g: number,
+		b: number,
+		a: number
+	) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
+
+		x |= 0;
+		y |= 0;
+		const index = (y * this.width + x) * 4;
+
+		this.image.data[index + 0] = r;
+		this.image.data[index + 1] = g;
+		this.image.data[index + 2] = b;
+		this.image.data[index + 3] = a;
+	}
+
 	line(x0: number, y0: number, x1: number, y1: number, color: PackedColor) {
 		x0 |= 0;
 		y0 |= 0;
@@ -149,22 +169,30 @@ export class Screen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const bounds = transform.applyToRect(sx, sy, sw, sh);
-
-		const inverse = transform.inv();
-
-		for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
-			for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
-				const point = inverse.apply(x, y);
-
-				// Check if the inverted point is within the rectangle.
-				if (
-					point.x >= sx &&
-					point.x < sx + sw &&
-					point.y >= sy &&
-					point.y < sy + sh
-				) {
+		if (transform.isIdentity()) {
+			for (let x = sx; x < sx + sw; x++) {
+				for (let y = sy; y < sy + sh; y++) {
 					this.pixel(x, y, color);
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(sx, sy, sw, sh);
+
+			const inverse = transform.inv();
+
+			for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
+				for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
+					const point = inverse.apply(x, y);
+
+					// Check if the inverted point is within the rectangle.
+					if (
+						point.x >= sx &&
+						point.x < sx + sw &&
+						point.y >= sy &&
+						point.y < sy + sh
+					) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -178,15 +206,22 @@ export class Screen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const tl = transform.apply(sx, sy);
-		const tr = transform.apply(sx + sw, sy);
-		const bl = transform.apply(sx, sy + sh);
-		const br = transform.apply(sx + sw, sy + sh);
+		if (transform.isIdentity()) {
+			this.line(sx, sy, sx + sw, sy, color);
+			this.line(sx + sw, sy, sx + sw, sy + sh, color);
+			this.line(sx, sy + sh, sx + sw, sy + sh, color);
+			this.line(sx, sy, sx, sy + sh, color);
+		} else {
+			const tl = transform.apply(sx, sy);
+			const tr = transform.apply(sx + sw, sy);
+			const bl = transform.apply(sx, sy + sh);
+			const br = transform.apply(sx + sw, sy + sh);
 
-		this.line(tl.x, tl.y, tr.x, tr.y, color);
-		this.line(tr.x, tr.y, br.x, br.y, color);
-		this.line(br.x, br.y, bl.x, bl.y, color);
-		this.line(bl.x, bl.y, tl.x, tl.y, color);
+			this.line(tl.x, tl.y, tr.x, tr.y, color);
+			this.line(tr.x, tr.y, br.x, br.y, color);
+			this.line(br.x, br.y, bl.x, bl.y, color);
+			this.line(bl.x, bl.y, tl.x, tl.y, color);
+		}
 	}
 
 	fillCirc(
@@ -196,31 +231,53 @@ export class Screen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const d = sr * 2 + 1;
-		const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+		if (transform.isIdentity()) {
+			let dx = sr;
+			let dy = 0;
+			let error = 1 - sr;
 
-		const inverse = transform.inv();
+			while (dx >= dy) {
+				this.line(-dx + sx, -dy + sy, -dx + sx, dy + sy, color);
+				this.line(-dy + sx, -dx + sy, -dy + sx, dx + sy, color);
+				this.line(dy + sx, -dx + sy, dy + sx, dx + sy, color);
+				this.line(dx + sx, -dy + sy, dx + sx, dy + sy, color);
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
+				dy++;
+
+				if (error < 0) {
+					error += 2 * dy + 1;
+				} else {
+					dx--;
+					error += 2 * (dy - dx + 1);
+				}
+			}
+		} else {
+			const d = sr * 2 + 1;
+			const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+
+			const inverse = transform.inv();
+
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-				const distance = Math.sqrt(
-					(point.x - sx) ** 2 + (point.y - sy) ** 2
-				);
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
+				) {
+					const point = inverse.apply(x, y);
+					const distance = Math.sqrt(
+						(point.x - sx) ** 2 + (point.y - sy) ** 2
+					);
 
-				// Check if the inverted point is within the circle.
-				if (distance <= d / 2) {
-					// NOTE: For debugging it can be useful to visualize the transformed pixels using light values.
-					// this.pixel(x, y, colors.fromHsl(0, 0, (point.x + point.y) / (this.width + this.height)));
-					this.pixel(x, y, color);
+					// Check if the inverted point is within the circle.
+					if (distance <= d / 2) {
+						// NOTE: For debugging it can be useful to visualize the transformed pixels using light values.
+						// this.pixel(x, y, colors.fromHsl(0, 0, (point.x + point.y) / (this.width + this.height)));
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -233,28 +290,54 @@ export class Screen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const d = sr * 2 + 1;
-		const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+		if (transform.isIdentity()) {
+			let dx = sr;
+			let dy = 0;
+			let error = 1 - sr;
 
-		const inverse = transform.inv();
+			while (dx >= dy) {
+				this.pixel(dx + sx, dy + sy, color);
+				this.pixel(dy + sx, dx + sy, color);
+				this.pixel(-dx + sx, dy + sy, color);
+				this.pixel(-dy + sx, dx + sy, color);
+				this.pixel(-dx + sx, -dy + sy, color);
+				this.pixel(-dy + sx, -dx + sy, color);
+				this.pixel(dx + sx, -dy + sy, color);
+				this.pixel(dy + sx, -dx + sy, color);
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
+				dy++;
+
+				if (error < 0) {
+					error += 2 * dy + 1;
+				} else {
+					dx--;
+					error += 2 * (dy - dx + 1);
+				}
+			}
+		} else {
+			const d = sr * 2 + 1;
+			const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+
+			const inverse = transform.inv();
+
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-				const distance = Math.sqrt(
-					(point.x - sx) ** 2 + (point.y - sy) ** 2
-				);
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
+				) {
+					const point = inverse.apply(x, y);
+					const distance = Math.sqrt(
+						(point.x - sx) ** 2 + (point.y - sy) ** 2
+					);
 
-				if (Math.abs(distance - sr) < 0.58) {
-					this.pixel(x, y, color);
+					if (Math.abs(distance - sr) < 0.58) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -275,31 +358,50 @@ export class Screen {
 		const top = Math.min(sy0, sy1, sy2);
 		const bottom = Math.max(sy0, sy1, sy2);
 
-		const bounds = transform.applyToRect(
-			left,
-			top,
-			right - left,
-			bottom - top
-		);
+		if (transform.isIdentity()) {
+			for (let x = Math.floor(left); x < Math.ceil(right); x++) {
+				for (let y = Math.floor(top); y < Math.ceil(bottom); y++) {
+					if (isPointInTri(x, y, sx0, sy0, sx1, sy1, sx2, sy2)) {
+						this.pixel(x, y, color);
+					}
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(
+				left,
+				top,
+				right - left,
+				bottom - top
+			);
 
-		const inverse = transform.inv();
+			const inverse = transform.inv();
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-
-				if (
-					isPointInTri(point.x, point.y, sx0, sy0, sx1, sy1, sx2, sy2)
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
 				) {
-					this.pixel(x, y, color);
+					const point = inverse.apply(x, y);
+
+					if (
+						isPointInTri(
+							point.x,
+							point.y,
+							sx0,
+							sy0,
+							sx1,
+							sy1,
+							sx2,
+							sy2
+						)
+					) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -315,13 +417,19 @@ export class Screen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const p0 = transform.apply(sx0, sy0);
-		const p1 = transform.apply(sx1, sy1);
-		const p2 = transform.apply(sx2, sy2);
+		if (transform.isIdentity()) {
+			this.line(sx0, sy0, sx1, sy1, color);
+			this.line(sx1, sy1, sx2, sy2, color);
+			this.line(sx2, sy2, sx0, sy0, color);
+		} else {
+			const p0 = transform.apply(sx0, sy0);
+			const p1 = transform.apply(sx1, sy1);
+			const p2 = transform.apply(sx2, sy2);
 
-		this.line(p0.x, p0.y, p1.x, p1.y, color);
-		this.line(p1.x, p1.y, p2.x, p2.y, color);
-		this.line(p2.x, p2.y, p0.x, p0.y, color);
+			this.line(p0.x, p0.y, p1.x, p1.y, color);
+			this.line(p1.x, p1.y, p2.x, p2.y, color);
+			this.line(p2.x, p2.y, p0.x, p0.y, color);
+		}
 	}
 }
 
@@ -358,6 +466,26 @@ export class VirtualScreen {
 		const index = (y * this.width + x) * 4;
 
 		const [r, g, b, a] = unpack(color);
+
+		this.image.data[index + 0] = r;
+		this.image.data[index + 1] = g;
+		this.image.data[index + 2] = b;
+		this.image.data[index + 3] = a;
+	}
+
+	pixelUnpacked(
+		x: number,
+		y: number,
+		r: number,
+		g: number,
+		b: number,
+		a: number
+	) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
+
+		x |= 0;
+		y |= 0;
+		const index = (y * this.width + x) * 4;
 
 		this.image.data[index + 0] = r;
 		this.image.data[index + 1] = g;
@@ -455,22 +583,30 @@ export class VirtualScreen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const bounds = transform.applyToRect(sx, sy, sw, sh);
-
-		const inverse = transform.inv();
-
-		for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
-			for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
-				const point = inverse.apply(x, y);
-
-				// Check if the inverted point is within the rectangle.
-				if (
-					point.x >= sx &&
-					point.x < sx + sw &&
-					point.y >= sy &&
-					point.y < sy + sh
-				) {
+		if (transform.isIdentity()) {
+			for (let x = sx; x < sx + sw; x++) {
+				for (let y = sy; y < sy + sh; y++) {
 					this.pixel(x, y, color);
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(sx, sy, sw, sh);
+
+			const inverse = transform.inv();
+
+			for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
+				for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
+					const point = inverse.apply(x, y);
+
+					// Check if the inverted point is within the rectangle.
+					if (
+						point.x >= sx &&
+						point.x < sx + sw &&
+						point.y >= sy &&
+						point.y < sy + sh
+					) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -484,15 +620,22 @@ export class VirtualScreen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const tl = transform.apply(sx, sy);
-		const tr = transform.apply(sx + sw, sy);
-		const bl = transform.apply(sx, sy + sh);
-		const br = transform.apply(sx + sw, sy + sh);
+		if (transform.isIdentity()) {
+			this.line(sx, sy, sx + sw, sy, color);
+			this.line(sx + sw, sy, sx + sw, sy + sh, color);
+			this.line(sx, sy + sh, sx + sw, sy + sh, color);
+			this.line(sx, sy, sx, sy + sh, color);
+		} else {
+			const tl = transform.apply(sx, sy);
+			const tr = transform.apply(sx + sw, sy);
+			const bl = transform.apply(sx, sy + sh);
+			const br = transform.apply(sx + sw, sy + sh);
 
-		this.line(tl.x, tl.y, tr.x, tr.y, color);
-		this.line(tr.x, tr.y, br.x, br.y, color);
-		this.line(br.x, br.y, bl.x, bl.y, color);
-		this.line(bl.x, bl.y, tl.x, tl.y, color);
+			this.line(tl.x, tl.y, tr.x, tr.y, color);
+			this.line(tr.x, tr.y, br.x, br.y, color);
+			this.line(br.x, br.y, bl.x, bl.y, color);
+			this.line(bl.x, bl.y, tl.x, tl.y, color);
+		}
 	}
 
 	fillCirc(
@@ -502,31 +645,53 @@ export class VirtualScreen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const d = sr * 2 + 1;
-		const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+		if (transform.isIdentity()) {
+			let dx = sr;
+			let dy = 0;
+			let error = 1 - sr;
 
-		const inverse = transform.inv();
+			while (dx >= dy) {
+				this.line(-dx + sx, -dy + sy, -dx + sx, dy + sy, color);
+				this.line(-dy + sx, -dx + sy, -dy + sx, dx + sy, color);
+				this.line(dy + sx, -dx + sy, dy + sx, dx + sy, color);
+				this.line(dx + sx, -dy + sy, dx + sx, dy + sy, color);
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
+				dy++;
+
+				if (error < 0) {
+					error += 2 * dy + 1;
+				} else {
+					dx--;
+					error += 2 * (dy - dx + 1);
+				}
+			}
+		} else {
+			const d = sr * 2 + 1;
+			const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+
+			const inverse = transform.inv();
+
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-				const distance = Math.sqrt(
-					(point.x - sx) ** 2 + (point.y - sy) ** 2
-				);
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
+				) {
+					const point = inverse.apply(x, y);
+					const distance = Math.sqrt(
+						(point.x - sx) ** 2 + (point.y - sy) ** 2
+					);
 
-				// Check if the inverted point is within the circle.
-				if (distance <= d / 2) {
-					// NOTE: For debugging it can be useful to visualize the transformed pixels using light values.
-					// this.pixel(x, y, colors.fromHsl(0, 0, (point.x + point.y) / (this.width + this.height)));
-					this.pixel(x, y, color);
+					// Check if the inverted point is within the circle.
+					if (distance <= d / 2) {
+						// NOTE: For debugging it can be useful to visualize the transformed pixels using light values.
+						// this.pixel(x, y, colors.fromHsl(0, 0, (point.x + point.y) / (this.width + this.height)));
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -539,28 +704,54 @@ export class VirtualScreen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const d = sr * 2 + 1;
-		const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+		if (transform.isIdentity()) {
+			let dx = sr;
+			let dy = 0;
+			let error = 1 - sr;
 
-		const inverse = transform.inv();
+			while (dx >= dy) {
+				this.pixel(dx + sx, dy + sy, color);
+				this.pixel(dy + sx, dx + sy, color);
+				this.pixel(-dx + sx, dy + sy, color);
+				this.pixel(-dy + sx, dx + sy, color);
+				this.pixel(-dx + sx, -dy + sy, color);
+				this.pixel(-dy + sx, -dx + sy, color);
+				this.pixel(dx + sx, -dy + sy, color);
+				this.pixel(dy + sx, -dx + sy, color);
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
+				dy++;
+
+				if (error < 0) {
+					error += 2 * dy + 1;
+				} else {
+					dx--;
+					error += 2 * (dy - dx + 1);
+				}
+			}
+		} else {
+			const d = sr * 2 + 1;
+			const bounds = transform.applyToRect(sx - d / 2, sy - d / 2, d, d);
+
+			const inverse = transform.inv();
+
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-				const distance = Math.sqrt(
-					(point.x - sx) ** 2 + (point.y - sy) ** 2
-				);
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
+				) {
+					const point = inverse.apply(x, y);
+					const distance = Math.sqrt(
+						(point.x - sx) ** 2 + (point.y - sy) ** 2
+					);
 
-				if (Math.abs(distance - sr) < 0.58) {
-					this.pixel(x, y, color);
+					if (Math.abs(distance - sr) < 0.58) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -581,31 +772,50 @@ export class VirtualScreen {
 		const top = Math.min(sy0, sy1, sy2);
 		const bottom = Math.max(sy0, sy1, sy2);
 
-		const bounds = transform.applyToRect(
-			left,
-			top,
-			right - left,
-			bottom - top
-		);
+		if (transform.isIdentity()) {
+			for (let x = Math.floor(left); x < Math.ceil(right); x++) {
+				for (let y = Math.floor(top); y < Math.ceil(bottom); y++) {
+					if (isPointInTri(x, y, sx0, sy0, sx1, sy1, sx2, sy2)) {
+						this.pixel(x, y, color);
+					}
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(
+				left,
+				top,
+				right - left,
+				bottom - top
+			);
 
-		const inverse = transform.inv();
+			const inverse = transform.inv();
 
-		for (
-			let x = Math.floor(bounds.x);
-			x < Math.ceil(bounds.x + bounds.width);
-			x++
-		) {
 			for (
-				let y = Math.floor(bounds.y);
-				y < Math.ceil(bounds.y + bounds.height);
-				y++
+				let x = Math.floor(bounds.x);
+				x < Math.ceil(bounds.x + bounds.width);
+				x++
 			) {
-				const point = inverse.apply(x, y);
-
-				if (
-					isPointInTri(point.x, point.y, sx0, sy0, sx1, sy1, sx2, sy2)
+				for (
+					let y = Math.floor(bounds.y);
+					y < Math.ceil(bounds.y + bounds.height);
+					y++
 				) {
-					this.pixel(x, y, color);
+					const point = inverse.apply(x, y);
+
+					if (
+						isPointInTri(
+							point.x,
+							point.y,
+							sx0,
+							sy0,
+							sx1,
+							sy1,
+							sx2,
+							sy2
+						)
+					) {
+						this.pixel(x, y, color);
+					}
 				}
 			}
 		}
@@ -621,13 +831,19 @@ export class VirtualScreen {
 		color: PackedColor,
 		transform = Matrix3.identity
 	) {
-		const p0 = transform.apply(sx0, sy0);
-		const p1 = transform.apply(sx1, sy1);
-		const p2 = transform.apply(sx2, sy2);
+		if (transform.isIdentity()) {
+			this.line(sx0, sy0, sx1, sy1, color);
+			this.line(sx1, sy1, sx2, sy2, color);
+			this.line(sx2, sy2, sx0, sy0, color);
+		} else {
+			const p0 = transform.apply(sx0, sy0);
+			const p1 = transform.apply(sx1, sy1);
+			const p2 = transform.apply(sx2, sy2);
 
-		this.line(p0.x, p0.y, p1.x, p1.y, color);
-		this.line(p1.x, p1.y, p2.x, p2.y, color);
-		this.line(p2.x, p2.y, p0.x, p0.y, color);
+			this.line(p0.x, p0.y, p1.x, p1.y, color);
+			this.line(p1.x, p1.y, p2.x, p2.y, color);
+			this.line(p2.x, p2.y, p0.x, p0.y, color);
+		}
 	}
 }
 
@@ -734,42 +950,62 @@ export class Sprite {
 		sy: number,
 		transform = Matrix3.identity
 	) {
-		const bounds = transform.applyToRect(
-			sx,
-			sy,
-			this.subregion.width,
-			this.subregion.height
-		);
-
-		const inverse = transform.inv();
-
-		for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
-			for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
-				const point = inverse.apply(x, y);
-
-				if (
-					point.x >= sx &&
-					point.x < sx + this.subregion.width &&
-					point.y >= sy &&
-					point.y < sy + this.subregion.height
-				) {
-					const index =
-						(Math.floor(point.y - sy) * this.subregion.width +
-							Math.floor(point.x - sx)) *
-						4;
-
+		if (transform.isIdentity()) {
+			for (let x = 0; x < this.subregion.width; x++) {
+				for (let y = 0; y < this.subregion.height; y++) {
+					const index = (y * this.subregion.width + x) * 4;
 					if (this.image.data[index + 3] === 0) {
 						continue;
 					}
 
-					const color = pack(
+					screen.pixelUnpacked(
+						x + sx,
+						y + sy,
 						this.image.data[index + 0],
 						this.image.data[index + 1],
 						this.image.data[index + 2],
 						this.image.data[index + 3]
 					);
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(
+				sx,
+				sy,
+				this.subregion.width,
+				this.subregion.height
+			);
 
-					screen.pixel(x, y, color);
+			const inverse = transform.inv();
+
+			for (let x = bounds.x; x < bounds.x + bounds.width; x++) {
+				for (let y = bounds.y; y < bounds.y + bounds.height; y++) {
+					const point = inverse.apply(x, y);
+
+					if (
+						point.x >= sx &&
+						point.x < sx + this.subregion.width &&
+						point.y >= sy &&
+						point.y < sy + this.subregion.height
+					) {
+						const index =
+							(Math.floor(point.y - sy) * this.subregion.width +
+								Math.floor(point.x - sx)) *
+							4;
+
+						if (this.image.data[index + 3] === 0) {
+							continue;
+						}
+
+						screen.pixelUnpacked(
+							x,
+							y,
+							this.image.data[index + 0],
+							this.image.data[index + 1],
+							this.image.data[index + 2],
+							this.image.data[index + 3]
+						);
+					}
 				}
 			}
 		}

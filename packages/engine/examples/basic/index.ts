@@ -225,8 +225,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			y,
 			width,
 			height,
-			engine.colors.fromHex("#ff0000"),
-			transform
+			engine.colors.fromHex("#ff0000")
+			// transform
 		);
 	})();
 
@@ -259,8 +259,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			y1,
 			x2,
 			y2,
-			engine.colors.fromHex("#00ff00"),
-			transform
+			engine.colors.fromHex("#00ff00")
+			// transform
 		);
 	})();
 
@@ -283,8 +283,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			x,
 			y,
 			radius,
-			engine.colors.fromHex("#0000ff"),
-			transform
+			engine.colors.fromHex("#0000ff")
+			// transform
 		);
 	})();
 
@@ -308,15 +308,15 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			y,
 			width,
 			height,
-			engine.colors.fromHex("#ff0000"),
-			transform
+			engine.colors.fromHex("#ff0000")
+			// transform
 		);
 	})();
 
 	(() => {
 		const rotation = ((t % 2_000) / 2_000) * (Math.PI * 2);
-		const base = 10;
-		const height = 10;
+		const base = 11;
+		const height = 11;
 		const x = surface.width / 2;
 		const y = surface.height / 2 + 20;
 		const transform = new engine.geometry.Matrix3([
@@ -342,8 +342,7 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			y1,
 			x2,
 			y2,
-			engine.colors.fromHex("#00ff00"),
-			transform
+			engine.colors.fromHex("#00ff00")
 		);
 	})();
 
@@ -366,8 +365,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			x,
 			y,
 			radius,
-			engine.colors.fromHex("#0000ff"),
-			transform
+			engine.colors.fromHex("#0000ff")
+			// transform
 		);
 	})();
 
@@ -384,7 +383,7 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			.rotate(rotation)
 			.translate(x, y);
 
-		rgbaSprite.render(surface, x, y, transform);
+		rgbaSprite.render(surface, x, y);
 	})();
 
 	(() => {
@@ -469,7 +468,7 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 			)
 			.translate(x, y);
 
-		animatedSprite.render(surface, playerX(), playerY(), transform);
+		// animatedSprite.render(surface, playerX(), playerY(), transform);
 	})();
 };
 
