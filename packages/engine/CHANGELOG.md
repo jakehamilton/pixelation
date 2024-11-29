@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.0
+
+### Features
+
+- add fast path for non-transformed graphics, create bricks example
+
 ## 1.3.0
 
 ### Features

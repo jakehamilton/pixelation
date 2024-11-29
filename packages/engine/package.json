@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/engine",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "description": "A simple pixel art game engine.",
     "files": [
         "dist/**/*",
