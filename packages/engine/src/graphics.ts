@@ -1,4 +1,8 @@
-import { Aseprite, AsepriteTagAnimationDirection } from "@pixelation/aseprite";
+import {
+	Aseprite,
+	AsepriteColorDepth,
+	AsepriteTagAnimationDirection,
+} from "@pixelation/aseprite";
 import { fromAsepritePixel, Color, PackedColor, unpack, pack } from "./colors";
 import { isPointInTri, Matrix3, Rect } from "./geometry";
 import { DeltaTime } from "./lifecycle";
@@ -919,11 +923,21 @@ export class Sprite {
 
 						if (
 							a === 0 ||
-							(transparent &&
+							(this.asset.header.depth !==
+								AsepriteColorDepth.Index &&
+								transparent &&
 								transparent.red === r &&
 								transparent.green === g &&
 								transparent.blue === b) ||
-							(!transparent && r === 0 && g === 0 && b === 0)
+							(this.asset.header.depth !==
+								AsepriteColorDepth.Index &&
+								!transparent &&
+								r === 0 &&
+								g === 0 &&
+								b === 0) ||
+							(this.asset.header.depth ===
+								AsepriteColorDepth.Index &&
+								pixel === 0)
 						) {
 							continue;
 						}
