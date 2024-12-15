@@ -687,13 +687,8 @@ export class Aseprite {
 				switch (chunk.kind) {
 					default:
 						// @ts-ignore-error
-						console.warn(
-							`Skipping unsupported Aseprite chunk: ${
-								AsepriteFileChunkKindReverseLookup[
-									chunk.kind
-								] || `0x${chunk.kind.toString(16)}`
-							}`
-						);
+						// prettier-ignore
+						console.warn(`Skipping unsupported Aseprite chunk: ${AsepriteFileChunkKindReverseLookup[chunk.kind] || `0x${chunk.kind.toString(16)}`}`);
 						break;
 					case AsepriteFileChunkKind.ColorProfile:
 						// We don't need to do anything with color profiles since the only palette used is indexed.
