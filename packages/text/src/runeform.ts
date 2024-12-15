@@ -496,8 +496,7 @@ export class Runeform extends BaseText {
 						xOffset +=
 							this.runes.asset.header.grid.width * 2 +
 							this.runeSpacing +
-							this.letterSpacing -
-							1;
+							this.letterSpacing;
 					}
 				} else if (isSymbol(char)) {
 					if (runeOffset > 0) {
