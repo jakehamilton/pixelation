@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.4.1
+
+### Fixes
+
+- add check for indexed transparent color, add unpacked color type
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.4.0
 
 ### Features

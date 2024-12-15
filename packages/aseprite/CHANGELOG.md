@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.2.1
+
+### Fixes
+
+- add prettier-ignore to avoid ts missing a comment
+
+- add support for old palette formats
+
 ## 1.2.0
 
 ### Features

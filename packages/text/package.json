@@ -41,8 +41,8 @@
         "vite-plugin-arraybuffer": "^0.0.8"
     },
     "dependencies": {
-        "@pixelation/aseprite": "1.2.0",
-        "@pixelation/engine": "^1.3.0"
+        "@pixelation/aseprite": "1.2.1",
+        "@pixelation/engine": "1.4.1"
     },
     "homepage": "https://github.com/jakehamilton/pixelation",
     "repository": {
