@@ -45,7 +45,7 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 	y += pos[1] + 1;
 
 	pos = new Runeform(
-		"000123456789masa'.,!m",
+		"000123456789masa'.,! mitama",
 		12,
 		Infinity,
 		Variation.Normal,
@@ -55,8 +55,8 @@ const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 	y += pos[1] + 1;
 
 	new Runeform(
-		"000 123",
-		11,
+		"mamima' .,!samita'''",
+		Infinity,
 		Infinity,
 		Variation.Normal,
 		WhiteSpace.BreakWord,
