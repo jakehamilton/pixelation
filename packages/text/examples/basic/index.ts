@@ -11,8 +11,6 @@ const highlight = engine.colors.fromHex("#f00");
 const text =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n1234567890\n+-/\\*:;()[]{}<>\n!?.,'\"&¡#^~¨`|¦$¢_@";
 
-const minWidth = 20;
-
 const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 	screen.canvas.style.width = "800px";
 	screen.canvas.style.height = "800px";
@@ -20,10 +18,7 @@ const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 	root.appendChild(screen.canvas);
 };
 
-const update: engine.lifecycle.Update = (surface, inputs, audio, dt, t) => {
-	const maxWidth = surface.width - 2;
-	const width = ((Math.sin(t / 5000) + 1) / 2) * (maxWidth - minWidth);
-};
+const update: engine.lifecycle.Update = (surface, inputs, audio, dt, t) => {};
 
 const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {
 	surface.clear();
