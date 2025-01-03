@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.0
+
+### Features
+
+- add cleanup signature to components
+
 ## 1.4.1
 
 ### Fixes
