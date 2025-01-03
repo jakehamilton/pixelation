@@ -1,6 +1,6 @@
 import { noop } from "./util";
 import { Tagged } from "./tagged";
-import { Screen, Surface } from "./graphics";
+import { Surface } from "./graphics";
 import { Inputs } from "./input";
 import { Audio } from "./audio";
 
@@ -9,95 +9,97 @@ export type Time = Tagged<"Time", number>;
 export type DeltaTime = Tagged<"DeltaTime", number>;
 
 export type Setup = (surface: Surface, inputs: Inputs, audio: Audio) => void;
+export type Cleanup = (surface: Surface, inputs: Inputs, audio: Audio) => void;
 export type Update = (
-    surface: Surface,
-    inputs: Inputs,
-    audio: Audio,
-    dt: DeltaTime,
-    t: Time
+	surface: Surface,
+	inputs: Inputs,
+	audio: Audio,
+	dt: DeltaTime,
+	t: Time
 ) => void;
 export type Render = (
-    surface: Surface,
-    inputs: Inputs,
-    dt: DeltaTime,
-    t: Time,
-    fps: Fps
+	surface: Surface,
+	inputs: Inputs,
+	dt: DeltaTime,
+	t: Time,
+	fps: Fps
 ) => void;
 
 export interface Component {
-    setup?: Setup;
-    update?: Update;
-    render: Render;
+	setup?: Setup;
+	cleanup?: Cleanup;
+	update?: Update;
+	render: Render;
 }
 
 export interface RunOptions {
-    surface: Surface;
-    setup?: Setup;
-    update?: Update;
-    render?: Render;
+	surface: Surface;
+	setup?: Setup;
+	update?: Update;
+	render?: Render;
 }
 
 export const run = ({
-    surface,
-    setup = noop,
-    update = noop,
-    render = noop,
+	surface,
+	setup = noop,
+	update = noop,
+	render = noop,
 }: RunOptions) => {
-    let t = 0 as Time;
-    let fps = 0 as Fps;
-    let frames = 0;
-    let fpsDelta = 0;
+	let t = 0 as Time;
+	let fps = 0 as Fps;
+	let frames = 0;
+	let fpsDelta = 0;
 
-    const inputs = new Inputs(surface);
-    const audio = new Audio();
+	const inputs = new Inputs(surface);
+	const audio = new Audio();
 
-    let visible = document.visibilityState === "visible";
+	let visible = document.visibilityState === "visible";
 
-    window.addEventListener("visibilitychange", () => {
-        visible = document.visibilityState === "visible";
+	window.addEventListener("visibilitychange", () => {
+		visible = document.visibilityState === "visible";
 
-        if (!visible) {
-            fps = 0 as Fps;
-            frames = 0;
-            fpsDelta = 0;
-        }
-    });
+		if (!visible) {
+			fps = 0 as Fps;
+			frames = 0;
+			fpsDelta = 0;
+		}
+	});
 
-    const loop = (time: number) => {
-        if (!visible) {
-            requestAnimationFrame(loop);
+	const loop = (time: number) => {
+		if (!visible) {
+			requestAnimationFrame(loop);
 
-            return;
-        }
+			return;
+		}
 
-        const dt = (time - t) as DeltaTime;
+		const dt = (time - t) as DeltaTime;
 
-        t = time as Time;
+		t = time as Time;
 
-        fpsDelta += dt;
+		fpsDelta += dt;
 
-        if (fpsDelta >= 1_000) {
-            fps = frames as Fps;
-            frames = 0;
-            fpsDelta = 0;
-        }
+		if (fpsDelta >= 1_000) {
+			fps = frames as Fps;
+			frames = 0;
+			fpsDelta = 0;
+		}
 
-        audio.update();
+		audio.update();
 
-        update(surface, inputs, audio, dt, t);
+		update(surface, inputs, audio, dt, t);
 
-        inputs.update();
+		inputs.update();
 
-        render(surface, inputs, dt, t, fps);
+		render(surface, inputs, dt, t, fps);
 
-        surface.commit();
+		surface.commit();
 
-        frames++;
+		frames++;
 
-        requestAnimationFrame(loop);
-    };
+		requestAnimationFrame(loop);
+	};
 
-    setup(surface, inputs, audio);
+	setup(surface, inputs, audio);
 
-    requestAnimationFrame(loop);
+	requestAnimationFrame(loop);
 };
