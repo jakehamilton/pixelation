@@ -106,6 +106,11 @@ export const easeOutCubic = (t: number) => --t * t * t + 1;
 export const easeInOutCubic = (t: number) =>
 	(t /= 0.5) < 1 ? 0.5 * t * t * t : 0.5 * ((t -= 2) * t * t + 2);
 
+export const easeInQuart = (t: number) => t * t * t * t;
+export const easeOutQuart = (t: number) => 1 - --t * t * t * t;
+export const easeInOutQuart = (t: number) =>
+	(t /= 0.5) < 1 ? 0.5 * t * t * t * t : -0.5 * ((t -= 2) * t * t * t - 2);
+
 export const easeInQuint = (t: number) => t * t * t * t * t;
 export const easeOutQuint = (t: number) => 1 + --t * t * t * t * t;
 export const easeInOutQuint = (t: number) =>
