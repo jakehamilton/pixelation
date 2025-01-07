@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.6.0
+
+### Features
+
+- _(easing)_: add color lerps
+
+- _(easing)_: add helpers for quart
+
 ## 1.5.0
 
 ### Features
