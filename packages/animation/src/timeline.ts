@@ -15,7 +15,7 @@ export interface TimelineAnimation {
 export class Timeline {
 	state = AnimationState.Stopped;
 
-	public readonly duration: AnimationDuration = 0;
+	public readonly duration: AnimationDuration = 0 as AnimationDuration;
 
 	private time = 0 as engine.lifecycle.Time;
 	private completed: Array<boolean>;
@@ -34,7 +34,7 @@ export class Timeline {
 			this.duration = Math.max(
 				this.duration,
 				offset + animation.duration
-			);
+			) as AnimationDuration;
 		}
 
 		this.completed = new Array(animations.length).fill(false);
