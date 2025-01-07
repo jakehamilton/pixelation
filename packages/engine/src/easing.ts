@@ -2,6 +2,8 @@
 // Thank you Werxzy for open sourcing your game so that others may learn from it :)
 // https://github.com/Werxzy/cards_api/blob/530568e70efb1fde592e067c98b8dcf8b0b2b9ef/util.lua#L56
 
+import { pack, PackedColor, unpack, UnpackedColor } from "./colors";
+
 export enum SmoothUpdateKind {
 	Position = "p",
 	Velocity = "v",
@@ -94,6 +96,30 @@ export const lerpSmooth = (a: number, b: number, decay: number, dt: number) => {
 	}
 
 	return value;
+};
+
+export const lerpColor = (x: PackedColor, y: PackedColor, t: number) => {
+	return pack(
+		...(lerpColorUnpacked(unpack(x), unpack(y), t) as [
+			number,
+			number,
+			number,
+			number
+		])
+	);
+};
+
+export const lerpColorUnpacked = (
+	x: UnpackedColor,
+	y: UnpackedColor,
+	t: number
+) => {
+	return [
+		Math.round(x[0] + (y[0] - x[0]) * t),
+		Math.round(x[1] + (y[1] - x[1]) * t),
+		Math.round(x[2] + (y[2] - x[2]) * t),
+		Math.round(x[3] + (y[3] - x[3]) * t),
+	] as UnpackedColor;
 };
 
 export const easeIn = (t: number) => t * t;
