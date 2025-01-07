@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.6.1
+
+### Chores
+
+- bump dependencies
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.6.0
 
 ### Features
