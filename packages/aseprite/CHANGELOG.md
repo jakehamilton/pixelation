@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.3
+
+### Fixes
+
+- handle max color packets in old palettes
+
 ## 1.2.2
 
 ### Chores

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.7.0
+
+### Features
+
+- add blit operations
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.6.1
 
 ### Chores

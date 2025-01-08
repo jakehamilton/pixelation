@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/focus",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Focus management for the Pixelation Engine.",
     "type": "module",
     "files": [
@@ -41,7 +41,7 @@
         "typescript": "^5.6.3"
     },
     "dependencies": {
-        "@pixelation/engine": "1.6.1"
+        "@pixelation/engine": "1.7.0"
     },
     "homepage": "https://github.com/jakehamilton/pixelation",
     "repository": {
