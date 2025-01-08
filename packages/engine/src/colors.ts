@@ -152,20 +152,29 @@ export const fromCmyk = (
 	);
 };
 
-export const blend = (
-	x: PackedColor,
-	y: PackedColor,
-	t: number = 0.5
-): PackedColor => {
+export const blend = (y: PackedColor, x: PackedColor): PackedColor => {
 	const [xr, xg, xb, xa] = unpack(x);
 	const [yr, yg, yb, ya] = unpack(y);
 
-	const r = xr + (yr - xr) * t;
-	const g = xg + (yg - xg) * t;
-	const b = xb + (yb - xb) * t;
-	const a = xa + (ya - xa) * t;
+	const a1 = xa / 255;
+	const a2 = ya / 255;
 
-	return pack(r, g, b, a);
+	const a = a1 + a2 * (1 - a1);
+
+	if (a === 0) {
+		return pack(0, 0, 0, 0);
+	}
+
+	const r = (xr * a1 + yr * a2 * (1 - a1)) / a;
+	const g = (xg * a1 + yg * a2 * (1 - a1)) / a;
+	const b = (xb * a1 + yb * a2 * (1 - a1)) / a;
+
+	return pack(
+		Math.round(r),
+		Math.round(g),
+		Math.round(b),
+		Math.round(a * 255)
+	);
 };
 
 export const PLACEHOLDER = fromHex("#c84cc6");

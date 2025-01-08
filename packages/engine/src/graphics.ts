@@ -10,6 +10,7 @@ import {
 	unpack,
 	pack,
 	fromHex,
+	blend,
 } from "./colors";
 import { isPointInTri, Matrix3, Rect } from "./geometry";
 import { DeltaTime } from "./lifecycle";
@@ -54,19 +55,34 @@ export class Screen {
 
 		const [r, g, b, a] = unpack(color);
 
-		if (a !== 255) {
-			return;
-		}
-
 		x |= 0;
 		y |= 0;
 
 		const index = (y * this.width + x) * 4;
 
-		this.image.data[index + 0] = r;
-		this.image.data[index + 1] = g;
-		this.image.data[index + 2] = b;
-		this.image.data[index + 3] = a;
+		if (a === 255) {
+			this.image.data[index + 0] = r;
+			this.image.data[index + 1] = g;
+			this.image.data[index + 2] = b;
+			this.image.data[index + 3] = a;
+		} else if (a > 0) {
+			const result = unpack(
+				blend(
+					pack(
+						this.image.data[index + 0],
+						this.image.data[index + 1],
+						this.image.data[index + 2],
+						this.image.data[index + 3]
+					),
+					color
+				)
+			);
+
+			this.image.data[index + 0] = result[0];
+			this.image.data[index + 1] = result[1];
+			this.image.data[index + 2] = result[2];
+			this.image.data[index + 3] = result[3];
+		}
 	}
 
 	pixelUnpacked(
@@ -79,19 +95,34 @@ export class Screen {
 	) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
 
-		if (a !== 255) {
-			return;
-		}
-
 		x |= 0;
 		y |= 0;
 
 		const index = (y * this.width + x) * 4;
 
-		this.image.data[index + 0] = r;
-		this.image.data[index + 1] = g;
-		this.image.data[index + 2] = b;
-		this.image.data[index + 3] = a;
+		if (a === 255) {
+			this.image.data[index + 0] = r;
+			this.image.data[index + 1] = g;
+			this.image.data[index + 2] = b;
+			this.image.data[index + 3] = a;
+		} else if (a > 0) {
+			const result = unpack(
+				blend(
+					pack(
+						this.image.data[index + 0],
+						this.image.data[index + 1],
+						this.image.data[index + 2],
+						this.image.data[index + 3]
+					),
+					pack(r, g, b, a)
+				)
+			);
+
+			this.image.data[index + 0] = result[0];
+			this.image.data[index + 1] = result[1];
+			this.image.data[index + 2] = result[2];
+			this.image.data[index + 3] = result[3];
+		}
 	}
 
 	blit(source: ImageData, x = 0, y = 0, transform = Matrix3.identity) {
@@ -670,14 +701,36 @@ export class VirtualScreen {
 	pixel(x: number, y: number, color: PackedColor) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
 
-		const index = (y * this.width + x) * 4;
-
 		const [r, g, b, a] = unpack(color);
 
-		this.image.data[index + 0] = r;
-		this.image.data[index + 1] = g;
-		this.image.data[index + 2] = b;
-		this.image.data[index + 3] = a;
+		x |= 0;
+		y |= 0;
+
+		const index = (y * this.width + x) * 4;
+
+		if (a === 255) {
+			this.image.data[index + 0] = r;
+			this.image.data[index + 1] = g;
+			this.image.data[index + 2] = b;
+			this.image.data[index + 3] = a;
+		} else if (a > 0) {
+			const result = unpack(
+				blend(
+					pack(
+						this.image.data[index + 0],
+						this.image.data[index + 1],
+						this.image.data[index + 2],
+						this.image.data[index + 3]
+					),
+					color
+				)
+			);
+
+			this.image.data[index + 0] = result[0];
+			this.image.data[index + 1] = result[1];
+			this.image.data[index + 2] = result[2];
+			this.image.data[index + 3] = result[3];
+		}
 	}
 
 	pixelUnpacked(
@@ -692,12 +745,32 @@ export class VirtualScreen {
 
 		x |= 0;
 		y |= 0;
+
 		const index = (y * this.width + x) * 4;
 
-		this.image.data[index + 0] = r;
-		this.image.data[index + 1] = g;
-		this.image.data[index + 2] = b;
-		this.image.data[index + 3] = a;
+		if (a === 255) {
+			this.image.data[index + 0] = r;
+			this.image.data[index + 1] = g;
+			this.image.data[index + 2] = b;
+			this.image.data[index + 3] = a;
+		} else if (a > 0) {
+			const result = unpack(
+				blend(
+					pack(
+						this.image.data[index + 0],
+						this.image.data[index + 1],
+						this.image.data[index + 2],
+						this.image.data[index + 3]
+					),
+					pack(r, g, b, a)
+				)
+			);
+
+			this.image.data[index + 0] = result[0];
+			this.image.data[index + 1] = result[1];
+			this.image.data[index + 2] = result[2];
+			this.image.data[index + 3] = result[3];
+		}
 	}
 
 	blit(source: ImageData, x = 0, y = 0) {
