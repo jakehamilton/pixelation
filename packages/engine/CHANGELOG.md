@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.8.0
+
+### Features
+
+- add color blending and cmyk helper
+
 ## 1.7.0
 
 ### Features

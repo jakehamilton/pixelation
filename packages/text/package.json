@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/text",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Text support for the Pixelation Engine.",
     "files": [
         "dist/**/*",
@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "@pixelation/aseprite": "1.2.3",
-        "@pixelation/engine": "1.7.0"
+        "@pixelation/engine": "1.8.0"
     },
     "homepage": "https://github.com/jakehamilton/pixelation",
     "repository": {
