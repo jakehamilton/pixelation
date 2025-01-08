@@ -11,7 +11,7 @@ export type Color = {
 export type PackedColor = Tagged<"PackedColor", number>;
 export type UnpackedColor = Tagged<
 	"UnpackedColor",
-	[number, number, number, number]
+	[red: number, green: number, blue: number, alpha: number]
 >;
 
 export const pack = (
@@ -131,6 +131,41 @@ export const fromHsl = (h: number, s: number, l: number) => {
 		Math.round(b * 255),
 		255
 	);
+};
+
+export const fromCmyk = (
+	c: number,
+	m: number,
+	y: number,
+	k: number,
+	a: number = 255
+) => {
+	let r = c * (1 - k) + k;
+	let g = m * (1 - k) + k;
+	let b = y * (1 - k) + k;
+
+	return pack(
+		Math.round((1 - r) * 255 + 0.5),
+		Math.round((1 - g) * 255 + 0.5),
+		Math.round((1 - b) * 255 + 0.5),
+		a
+	);
+};
+
+export const blend = (
+	x: PackedColor,
+	y: PackedColor,
+	t: number = 0.5
+): PackedColor => {
+	const [xr, xg, xb, xa] = unpack(x);
+	const [yr, yg, yb, ya] = unpack(y);
+
+	const r = xr + (yr - xr) * t;
+	const g = xg + (yg - xg) * t;
+	const b = xb + (yb - xb) * t;
+	const a = xa + (ya - xa) * t;
+
+	return pack(r, g, b, a);
 };
 
 export const PLACEHOLDER = fromHex("#c84cc6");
