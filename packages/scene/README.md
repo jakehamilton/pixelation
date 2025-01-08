@@ -1,6 +1,6 @@
 # @pixelation/scene
 
-> Focus management for the Pixelation Engine.
+> Scene management for the Pixelation Engine.
 
 ## Installation
 
