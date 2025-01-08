@@ -50,15 +50,21 @@ const color = new Animation((progress, surface, inputs, audio, dt, t) => {
 	}
 }, 4_000);
 
-const timeline = new Timeline(
-	[
-		{ animation: move, offset: 0 },
-		{ animation: color, offset: 2_000 },
-		{ animation: move, offset: 4_000 },
-		{ animation: color, offset: 6_000 },
-	],
-	true
-);
+const timeline = new Timeline([
+	{ animation: move, offset: 0 },
+	{ animation: color, offset: 2_000 },
+	{ animation: move, offset: 4_000 },
+	{ animation: color, offset: 6_000 },
+]);
+
+const moveY = new Animation((progress, surface, inputs, audio, dt, t) => {
+	box.y = engine.easing.lerp(10, 200, engine.easing.easeInOutQuart(progress));
+}, 10_000);
+
+const composed = new Timeline([
+	{ animation: timeline, offset: 0 },
+	{ animation: moveY, offset: 0 },
+]);
 
 const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 	screen.canvas.style.width = "800px";
@@ -70,13 +76,13 @@ const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 const update: engine.lifecycle.Update = (surface, inputs, audio, dt, t) => {
 	if (inputs.keyboard.pressed("Space")) {
 		if (move.state === AnimationState.Playing) {
-			timeline.pause();
+			composed.pause();
 		} else {
-			timeline.play();
+			composed.play();
 		}
 	}
 
-	timeline.update(surface, inputs, audio, dt, t);
+	composed.update(surface, inputs, audio, dt, t);
 };
 
 const render: engine.lifecycle.Render = (surface, inputs, dt, t, fps) => {

@@ -1,18 +1,22 @@
 import * as engine from "@pixelation/engine";
 
+import { Animation } from "./animation";
+
 import {
-	Animation,
-	AnimationDirection,
+	AnimationProgress,
 	AnimationDuration,
+	AnimationFn,
 	AnimationState,
-} from "./animation";
+	AnimationDirection,
+	Animatable,
+} from "./animatable";
 
 export interface TimelineAnimation {
-	animation: Animation;
+	animation: Animation | Animatable;
 	offset: engine.lifecycle.Time | number;
 }
 
-export class Timeline {
+export class Timeline implements Animatable {
 	state = AnimationState.Stopped;
 
 	public readonly duration: AnimationDuration = 0 as AnimationDuration;
@@ -25,7 +29,7 @@ export class Timeline {
 		public loop = false
 	) {
 		for (const { animation, offset } of animations) {
-			if (animation.loop) {
+			if ((animation as Animation).loop) {
 				throw new Error("Timeline animations cannot loop.");
 			}
 
@@ -76,9 +80,12 @@ export class Timeline {
 			}
 		}
 
-		if (this.loop && this.time >= this.duration) {
+		if (this.time >= this.duration) {
 			this.stop();
-			this.play();
+
+			if (this.loop) {
+				this.play();
+			}
 		}
 	}
 
