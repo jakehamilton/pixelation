@@ -798,12 +798,23 @@ export class Aseprite {
 		 * WORD        Chunk type
 		 * BYTE[]      Chunk data
 		 */
+		const cursor = this.cursor;
 		const size = this.readSignedInt32();
 		const type = this.readSignedInt16();
 
 		switch (type) {
-			case AsepriteFileChunkKind.OldPalette0:
-				return this.parseOldPalette0();
+			case AsepriteFileChunkKind.OldPalette0: {
+				const palette = this.parseOldPalette0();
+
+				console.log({
+					start: cursor,
+					end: this.cursor,
+					expected: size,
+					actual: this.cursor - cursor,
+				});
+
+				return palette;
+			}
 			case AsepriteFileChunkKind.OldPalette1:
 				return this.parseOldPalette1();
 			case AsepriteFileChunkKind.Layer:
@@ -852,7 +863,11 @@ export class Aseprite {
 
 		for (let i = 0; i < packets; i++) {
 			const offset = this.readByte();
-			const colors = this.readByte();
+			let colors = this.readByte();
+
+			if (colors === 0) {
+				colors = 256 as AsepriteByte;
+			}
 
 			const packet: AsepriteFileOldPalette0ChunkPacket = {
 				offset,
@@ -894,7 +909,11 @@ export class Aseprite {
 
 		for (let i = 0; i < packets; i++) {
 			const offset = this.readByte();
-			const colors = this.readByte();
+			let colors = this.readByte();
+
+			if (colors === 0) {
+				colors = 256 as AsepriteByte;
+			}
 
 			const packet: AsepriteFileOldPalette0ChunkPacket = {
 				offset,
