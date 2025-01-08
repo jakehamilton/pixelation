@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.2
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.1.1
 
 ### Notes

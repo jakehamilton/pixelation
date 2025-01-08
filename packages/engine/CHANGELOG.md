@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.8.1
+
+### Other
+
+- support proper alpha blending
+
 ## 1.8.0
 
 ### Features
