@@ -13,3 +13,4 @@ similar in principle to Pico-8 or Picotron in terms of code.
 | [@pixelation/text](./packages/text/)           | A basic text-rendering package for English or Runeform text.                    |
 | [@pixelation/focus](./packages/focus/)         | Manage focus of interactive elements.                                           |
 | [@pixelation/animation](./packages/animation/) | Create and play animations or animation timelines.                              |
+| [@pixelation/scene](./packages/scene/)         | Manage transitions between different scenes.                                    |
