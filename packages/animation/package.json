@@ -4,6 +4,7 @@
     "description": "Animation support for the Pixelation Engine.",
     "type": "module",
     "files": [
+        "dist/*",
         "dist/**/*",
         "CHANGELOG.md",
         "LICENSE",

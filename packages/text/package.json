@@ -3,6 +3,7 @@
     "version": "1.0.9",
     "description": "Text support for the Pixelation Engine.",
     "files": [
+        "dist/*",
         "dist/**/*",
         "CHANGELOG.md",
         "LICENSE",

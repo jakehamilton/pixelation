@@ -4,6 +4,7 @@
     "description": "Focus management for the Pixelation Engine.",
     "type": "module",
     "files": [
+        "dist/*",
         "dist/**/*",
         "CHANGELOG.md",
         "LICENSE",
