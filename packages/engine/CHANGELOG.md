@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.8.3
+
+### Fixes
+
+- _(ci)_: appease npm's broken file matching
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.8.2
 
 ### Fixes

@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/aseprite",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "A library for parsing Aseprite files.",
     "files": [
         "dist/*",

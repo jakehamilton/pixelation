@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.4
+
+### Fixes
+
+- _(ci)_: appease npm's broken file matching
+
 ## 1.2.3
 
 ### Fixes
