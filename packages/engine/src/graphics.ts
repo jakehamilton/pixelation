@@ -773,56 +773,20 @@ export class VirtualScreen {
 		}
 	}
 
-	blit(source: ImageData, x = 0, y = 0) {
-		for (let sy = 0; sy < source.height; sy++) {
-			if (sy + y < 0 || sy + y >= this.height) {
-				continue;
-			}
-
-			for (let sx = 0; sx < source.width; sx++) {
-				if (sx + x < 0 || sx + x >= this.width) {
+	blit(source: ImageData, x = 0, y = 0, transform = Matrix3.identity) {
+		if (transform.isIdentity()) {
+			for (let sy = 0; sy < source.height; sy++) {
+				if (sy + y < 0 || sy + y >= this.height) {
 					continue;
 				}
 
-				const sIndex = (sy * source.width + sx) * 4;
+				for (let sx = 0; sx < source.width; sx++) {
+					if (sx + x < 0 || sx + x >= this.width) {
+						continue;
+					}
 
-				this.pixelUnpacked(
-					sx + x,
-					sy + y,
-					source.data[sIndex + 0],
-					source.data[sIndex + 1],
-					source.data[sIndex + 2],
-					source.data[sIndex + 3]
-				);
-			}
-		}
-	}
+					const sIndex = (sy * source.width + sx) * 4;
 
-	blitMask(source: ImageData, mask: ImageData, x = 0, y = 0) {
-		for (let sy = 0; sy < source.height; sy++) {
-			if (sy + y < 0 || sy + y >= this.height) {
-				continue;
-			}
-
-			for (let sx = 0; sx < source.width; sx++) {
-				if (sx + x < 0 || sx + x >= this.width) {
-					continue;
-				}
-
-				const mIndex = (sy * mask.width + sx) * 4;
-
-				if (mIndex + 3 >= mask.data.length) {
-					continue;
-				}
-
-				const sIndex = (sy * source.width + sx) * 4;
-
-				if (
-					mask.data[mIndex] === 255 &&
-					mask.data[mIndex + 1] === 255 &&
-					mask.data[mIndex + 2] === 255 &&
-					mask.data[mIndex + 3] === 255
-				) {
 					this.pixelUnpacked(
 						sx + x,
 						sy + y,
@@ -831,6 +795,166 @@ export class VirtualScreen {
 						source.data[sIndex + 2],
 						source.data[sIndex + 3]
 					);
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(
+				x,
+				y,
+				source.width,
+				source.height
+			);
+			const inverse = transform.inv();
+
+			for (
+				let sy = Math.floor(bounds.y);
+				sy < Math.ceil(bounds.y + bounds.height);
+				sy++
+			) {
+				for (
+					let sx = Math.floor(bounds.x);
+					sx < Math.ceil(bounds.x + bounds.width);
+					sx++
+				) {
+					const point = inverse.apply(sx, sy);
+					point.x -= x;
+					point.y -= y;
+
+					if (
+						point.x < 0 ||
+						point.x >= source.width ||
+						point.y < 0 ||
+						point.y >= source.height
+					) {
+						continue;
+					}
+
+					const sIndex =
+						(Math.floor(point.y) * source.width +
+							Math.floor(point.x)) *
+						4;
+
+					this.pixel(
+						sx,
+						sy,
+						pack(
+							source.data[sIndex + 0],
+							source.data[sIndex + 1],
+							source.data[sIndex + 2],
+							source.data[sIndex + 3]
+						)
+					);
+				}
+			}
+		}
+	}
+
+	blitMask(
+		source: ImageData,
+		mask: ImageData,
+		x = 0,
+		y = 0,
+		transform = Matrix3.identity
+	) {
+		if (transform.isIdentity()) {
+			for (let sy = 0; sy < source.height; sy++) {
+				if (sy + y < 0 || sy + y >= this.height) {
+					continue;
+				}
+
+				for (let sx = 0; sx < source.width; sx++) {
+					if (sx + x < 0 || sx + x >= this.width) {
+						continue;
+					}
+
+					const mIndex = (sy * mask.width + sx) * 4;
+
+					if (mIndex + 3 >= mask.data.length) {
+						continue;
+					}
+
+					const sIndex = (sy * source.width + sx) * 4;
+
+					if (
+						mask.data[mIndex] === 255 &&
+						mask.data[mIndex + 1] === 255 &&
+						mask.data[mIndex + 2] === 255 &&
+						mask.data[mIndex + 3] === 255
+					) {
+						this.pixelUnpacked(
+							sx + x,
+							sy + y,
+							source.data[sIndex + 0],
+							source.data[sIndex + 1],
+							source.data[sIndex + 2],
+							source.data[sIndex + 3]
+						);
+					}
+				}
+			}
+		} else {
+			const bounds = transform.applyToRect(
+				x,
+				y,
+				source.width,
+				source.height
+			);
+			const inverse = transform.inv();
+
+			for (
+				let sy = Math.floor(bounds.y);
+				sy < Math.ceil(bounds.y + bounds.height);
+				sy++
+			) {
+				for (
+					let sx = Math.floor(bounds.x);
+					sx < Math.ceil(bounds.x + bounds.width);
+					sx++
+				) {
+					const point = inverse.apply(sx, sy);
+					point.x -= x;
+					point.y -= y;
+
+					if (
+						point.x < 0 ||
+						point.x >= source.width ||
+						point.y < 0 ||
+						point.y >= source.height
+					) {
+						continue;
+					}
+
+					const mIndex =
+						(Math.floor(point.y) * mask.width +
+							Math.floor(point.x)) *
+						4;
+
+					if (mIndex + 3 >= mask.data.length) {
+						continue;
+					}
+
+					const sIndex =
+						(Math.floor(point.y) * source.width +
+							Math.floor(point.x)) *
+						4;
+
+					if (
+						mask.data[mIndex] === 255 &&
+						mask.data[mIndex + 1] === 255 &&
+						mask.data[mIndex + 2] === 255 &&
+						mask.data[mIndex + 3] === 255
+					) {
+						this.pixel(
+							sx,
+							sy,
+							pack(
+								source.data[sIndex + 0],
+								source.data[sIndex + 1],
+								source.data[sIndex + 2],
+								source.data[sIndex + 3]
+							)
+						);
+					}
 				}
 			}
 		}

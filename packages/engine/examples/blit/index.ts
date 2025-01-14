@@ -49,8 +49,6 @@ const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 		"click",
 		() => {
 			audio.context.resume();
-			// music.play();
-			// sfx.play();
 		},
 		{
 			once: true,
@@ -65,67 +63,6 @@ const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
 };
 
 const update: engine.lifecycle.Update = (surface, inputs, audio, dt) => {
-	const gamepad = inputs.gamepads[0];
-
-	const x = playerX();
-	const y = playerY();
-
-	let isMoving = false;
-
-	if (
-		inputs.keyboard.held("w") ||
-		inputs.keyboard.held("ArrowUp") ||
-		gamepad.held(UP_BUTTON) ||
-		gamepad.axis(LEFT_STICK_Y) < 0 - STICK_SENSITIVITY
-	) {
-		isMoving = true;
-		playerY(y - 1);
-	}
-
-	if (
-		inputs.keyboard.held("s") ||
-		inputs.keyboard.held("ArrowDown") ||
-		gamepad.held(DOWN_BUTTON) ||
-		gamepad.axis(LEFT_STICK_Y) > 0 + STICK_SENSITIVITY
-	) {
-		isMoving = true;
-		playerY(y + 1);
-	}
-
-	if (
-		inputs.keyboard.held("a") ||
-		inputs.keyboard.held("ArrowLeft") ||
-		gamepad.held(LEFT_BUTTON) ||
-		gamepad.axis(LEFT_STICK_X) < 0 - STICK_SENSITIVITY
-	) {
-		isMoving = true;
-		playerX(x - 1);
-	}
-
-	if (
-		inputs.keyboard.held("d") ||
-		inputs.keyboard.held("ArrowRight") ||
-		gamepad.held(RIGHT_BUTTON) ||
-		gamepad.axis(LEFT_STICK_X) > 0 + STICK_SENSITIVITY
-	) {
-		isMoving = true;
-		playerX(x + 1);
-	}
-
-	if (!isMoving) {
-		playerX(engine.easing.SmoothUpdateKind.Step);
-		playerY(engine.easing.SmoothUpdateKind.Step);
-	}
-
-	const nextX = playerX();
-	const nextY = playerY();
-
-	if (x !== nextX || y !== nextY) {
-		animatedSprite.play();
-	} else {
-		animatedSprite.pause();
-	}
-
 	mouseX(inputs.mouse.x);
 	mouseY(inputs.mouse.y);
 
