@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.8.2
+
+### Fixes
+
+- support blit transform on virtual screen
+
 ## 1.8.1
 
 ### Other
