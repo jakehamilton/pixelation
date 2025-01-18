@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.0.7
+
+### Fixes
+
+- use externals, map umd globals
+
+- avoid nullish access to ensure function is called
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.0.6
 
 ### Other

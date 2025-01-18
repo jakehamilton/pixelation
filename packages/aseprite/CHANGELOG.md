@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.5
+
+### Fixes
+
+- use externals, map umd globals
+
 ## 1.2.4
 
 ### Fixes

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.8.4
+
+### Fixes
+
+- use externals, map umd globals
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.8.3
 
 ### Fixes
