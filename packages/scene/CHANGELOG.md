@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.6
+
+### Other
+
+- expose scene switching state and components
+
 ## 1.0.5
 
 ### Fixes
