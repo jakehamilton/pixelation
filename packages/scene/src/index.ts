@@ -46,7 +46,9 @@ export class Switcher {
 			this.isCurrentInitialized = true;
 		}
 
-		this.current.update?.(surface, inputs, audio, dt, t);
+		if (this.current.update) {
+			this.current.update(surface, inputs, audio, dt, t);
+		}
 
 		if (this.target === null) {
 			return;
@@ -57,7 +59,9 @@ export class Switcher {
 			this.isTargetInitialized = true;
 		}
 
-		this.target.update?.(surface, inputs, audio, dt, t);
+		if (this.target.update) {
+			this.target.update(surface, inputs, audio, dt, t);
+		}
 
 		this.time = (this.time + dt) as engine.lifecycle.Time;
 
