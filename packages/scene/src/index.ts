@@ -1,13 +1,13 @@
 import * as engine from "@pixelation/engine";
 
 export class Switcher {
-	private current: engine.lifecycle.Component;
-	private target: engine.lifecycle.Component | null = null;
+	public current: engine.lifecycle.Component;
+	public target: engine.lifecycle.Component | null = null;
 
 	private isCurrentInitialized = false;
 	private isTargetInitialized = false;
 
-	private isSwitching = false;
+	public isSwitching = false;
 	public duration = 0 as engine.lifecycle.Time;
 	private time = 0 as engine.lifecycle.Time;
 
