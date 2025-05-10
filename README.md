@@ -14,6 +14,7 @@ similar in principle to Pico-8 or Picotron in terms of code.
 | [@pixelation/focus](./packages/focus/)         | Manage focus of interactive elements.                                           |
 | [@pixelation/animation](./packages/animation/) | Create and play animations or animation timelines.                              |
 | [@pixelation/scene](./packages/scene/)         | Manage transitions between different scenes.                                    |
+| [@pixelation/state](./packages/state/)         | Composable, reactive state management.                                          |
 
 ## Contributing
 
