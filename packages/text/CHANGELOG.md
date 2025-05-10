@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.12
+
+### Chores
+
+- update lock files
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.0.11
 
 ### Fixes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.6
+
+### Chores
+
+- update lock files
+
 ## 1.2.5
 
 ### Fixes

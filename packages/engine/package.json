@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/engine",
-    "version": "1.8.4",
+    "version": "1.8.5",
     "description": "A simple pixel art game engine.",
     "files": [
         "dist/*",
@@ -42,7 +42,7 @@
         "vite-plugin-arraybuffer": "^0.0.8"
     },
     "dependencies": {
-        "@pixelation/aseprite": "1.2.5"
+        "@pixelation/aseprite": "1.2.6"
     },
     "homepage": "https://github.com/jakehamilton/pixelation",
     "repository": {

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.1.6
+
+### Chores
+
+- update lock files
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.1.5
 
 ### Fixes

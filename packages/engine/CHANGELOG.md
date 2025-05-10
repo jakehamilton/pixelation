@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.8.5
+
+### Chores
+
+- update lock files
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.8.4
 
 ### Fixes

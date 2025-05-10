@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.9
+
+### Chores
+
+- update lock files
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.0.8
 
 ### Fixes
