@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.7
+
+### Fixes
+
+- minor tweaks for version bump
+
 ## 1.2.6
 
 ### Chores

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.1.8
+
+### Fixes
+
+- minor tweaks for version bump
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.1.7
 
 ### Notes

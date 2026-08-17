@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.15
+
+### Fixes
+
+- minor tweaks for version bump
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.0.14
 
 ### Notes

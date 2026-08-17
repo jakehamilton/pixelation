@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.8.7
+
+### Fixes
+
+- minor tweaks for version bump
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.8.6
 
 ### Fixes
