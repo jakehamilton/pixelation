@@ -5,6 +5,10 @@ on:
         branches:
             - "main"
 
+permissions:
+    id-token: write
+    contents: read
+
 jobs:
     release:
         runs-on: ubuntu-latest
@@ -33,15 +37,11 @@ jobs:
                   git checkout "${GITHUB_REF:11}"
                   git pull --ff-only
                   git fetch origin +refs/tags/*:refs/tags/*
-            - name: Configure Node
-              uses: actions/setup-node@v1
+            - uses: actions/setup-node@v6
               with:
-                  node-version: "20.x"
-            - name: Configure NPM
-              run: |
-                  npm i -g npm@10
-                  npm config set registry https://registry.npmjs.org/
-                  npm config set //registry.npmjs.org/:_authToken=\${NPM_TOKEN}
+                  node-version: "24"
+                  registry-url: "https://registry.npmjs.org"
+                  package-manager-cache: false # never use caching in release builds
             - name: Check Authentication with Registry
               run: npm whoami
             - name: Install Dependencies
