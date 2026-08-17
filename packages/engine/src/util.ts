@@ -1,9 +1,15 @@
+/**
+ * Do nothing.
+ */
 export const noop = () => {};
 
+/**
+ * Clone an ArrayBuffer's contents into a new ArrayBuffer.
+ */
 export const cloneArrayBuffer = (buffer: ArrayBuffer) => {
-    const clone = new ArrayBuffer(buffer.byteLength);
+	const clone = new ArrayBuffer(buffer.byteLength);
 
-    new Uint8Array(clone).set(new Uint8Array(buffer));
+	new Uint8Array(clone).set(new Uint8Array(buffer));
 
-    return clone;
+	return clone;
 };
