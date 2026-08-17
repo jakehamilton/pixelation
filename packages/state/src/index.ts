@@ -165,6 +165,48 @@ export class Store {
 	id = 0;
 	queue: Array<AnyAtom> = [];
 
+	/**
+	 * Create an atom.
+	 *
+	 * ```ts
+	 * // A normal atom that can be read from and written to.
+	 * const myAtom = atom(0);
+	 * set(myAtom, 42);
+	 * get(myAtom);
+	 *
+	 * // A dynamic atom which can be read from.
+	 * const myDynamicReadAtom = atom((get) => get(myAtom));
+	 * get(myDynamicReadAtom);
+	 *
+	 * // A dynamic atom which can be written to.
+	 * const myDynamicWriteAtom = atom(null, async (get, set, value) => {
+	 *		// Do something with `value`.
+	 *		const response = await fetch("https://example.com", {
+	 *			method: "POST",
+	 *			body: JSON.stringify(value),
+	 *		});
+	 *
+	 *		set(myAtom, await response.json());
+	 * });
+	 * set(myDynamicWriteAtom, { data: 42 });
+	 *
+	 * // A dynamic atom which can be read from and written to.
+	 * const myDynamicReadWriteAtom = atom(
+	 *		(get) => get(myAtom),
+	 *		async (get, set, value) => {
+	 *			// Do something with `value`.
+	 *			const response = await fetch("https://example.com", {
+	 *				method: "POST",
+	 *				body: JSON.stringify(value),
+	 *			});
+	 *
+	 *			set(myAtom, await response.json());
+	 *		}
+	 * );
+	 * get(myDynamicReadAtom);
+	 * set(myDynamicWriteAtom, { data: 42 });
+	 * ```
+	 */
 	// @ts-expect-error
 	atom: AtomFactory = (
 		reader: Primitive | (<T>(get: AtomGet) => T),
@@ -199,11 +241,27 @@ export class Store {
 		return atom as AnyAtom;
 	};
 
+	/**
+	 * Get the value of an atom.
+	 *
+	 * ```ts
+	 *	const myAtom = atom(42);
+	 *	get(myAtom);
+	 * ```
+	 */
 	// @ts-expect-error
 	get: AtomGet = (atom: AnyReadAtom) => {
 		return atom.value;
 	};
 
+	/**
+	 * Set the value of an atom.
+	 *
+	 * ```ts
+	 *	const myAtom = atom(0);
+	 *	set(myAtom, 42);
+	 * ```
+	 */
 	set: AtomSet = (
 		atom: AnyReadAtom | AnyReadWriteAtom,
 		...args: Array<unknown>
@@ -231,6 +289,10 @@ export class Store {
 		return value;
 	};
 
+	/**
+	 * Manually perform a state store update, processing any atom dependencies
+	 * that have been queued. Normally you do not need to use this.
+	 */
 	update = () => {
 		while (this.queue.length > 0) {
 			const atom = this.queue.shift()!;

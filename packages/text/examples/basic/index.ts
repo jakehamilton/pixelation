@@ -11,8 +11,6 @@ const highlight = engine.colors.fromHex("#f00");
 const text =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n1234567890\n+-/\\*:;()[]{}<>\n!?.,'\"&¡#%^~¨`|¦$¢_@";
 
-const compactText = "abcdefghijklmnopqrstuvwxyz\n1234567890";
-
 let hue = 0;
 
 const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {

@@ -1,5 +1,17 @@
 import * as engine from "@pixelation/engine";
 
+/**
+ * A scene switcher, useful for transitioning between multiple scenes
+ * in a sequenced fashion.
+ *
+ * ```ts
+ * // Create your switcher with your initial scene.
+ * const switcher = new Switcher(sceneA);
+ *
+ * // Switch to a different scene later.
+ * switcher.switch(sceneB, 1_000);
+ * ```
+ */
 export class Switcher {
 	public current: engine.lifecycle.Component;
 	public target: engine.lifecycle.Component | null = null;

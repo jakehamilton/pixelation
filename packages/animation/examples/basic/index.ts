@@ -17,8 +17,8 @@ const highlight = engine.colors.fromHex("#f00");
 const createBox = (row: number, col: number) => ({
 	x: 10 + col * 40,
 	y: 10 + row * 40,
-	width: 30,
-	height: 30,
+	width: 20,
+	height: 20,
 	color: white,
 });
 

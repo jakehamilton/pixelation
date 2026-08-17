@@ -3,7 +3,7 @@ import * as engine from "../../src";
 
 const WIDTH = 200;
 const HEIGHT = 200;
-const SPEED_INCREMENT = 0.1;
+const SPEED_INCREMENT = 0.075;
 
 const root = document.getElementById("root")!;
 const screen = new engine.graphics.Screen(WIDTH, HEIGHT);

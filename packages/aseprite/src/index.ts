@@ -1,7 +1,7 @@
 import pako from "pako";
 
 // Data types
-// ================================================
+// ===============================================
 
 export type Tagged<Name extends string, Type> = Type & { __tag: Name };
 
@@ -64,7 +64,7 @@ export type AsepriteFlags = Tagged<"AsepriteFlags", number>;
 export type AsepriteBigFlags = Tagged<"AsepriteBigFlags", number>;
 
 // File header
-// ================================================
+// ===============================================
 
 export enum AsepriteColorDepth {
 	Rgba = 32,
@@ -112,7 +112,7 @@ export interface AsepriteFileHeader {
 }
 
 // File chunks
-// ================================================
+// ===============================================
 
 export enum AsepriteFileChunkKind {
 	/** An old palette format that is included for compatibility. */
@@ -453,7 +453,7 @@ export type AsepriteFileChunk =
 	| AsepriteFileTagsChunk;
 
 // Parsed data
-// ================================================
+// ===============================================
 
 export interface AsepriteFrame {
 	duration: number;
@@ -481,7 +481,7 @@ export interface AsepriteCel {
 }
 
 // Aseprite
-// ================================================
+// ===============================================
 
 export class Aseprite {
 	/** The current byte index in the file. */
@@ -511,7 +511,7 @@ export class Aseprite {
 	}
 
 	// File parsing
-	// ================================================
+	// ===============================================
 
 	private parseHeader(): AsepriteFileHeader {
 		/**
@@ -1566,7 +1566,7 @@ export class Aseprite {
 	}
 
 	// Helpers for consuming data from the file.
-	// ================================================
+	// ===============================================
 
 	/** Read a single byte from the file. */
 	private readByte(): AsepriteByte {

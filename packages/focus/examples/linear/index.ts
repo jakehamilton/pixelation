@@ -18,8 +18,8 @@ const boxes = Array.from({ length: 5 }, (_, i) => ({
 const focus = new LinearFocus(boxes, true);
 
 const setup: engine.lifecycle.Setup = (surface, inputs, audio) => {
-	screen.canvas.style.width = "800px";
-	screen.canvas.style.height = "800px";
+	screen.canvas.style.width = "600px";
+	screen.canvas.style.height = "600px";
 
 	root.appendChild(screen.canvas);
 };
