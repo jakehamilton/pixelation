@@ -213,6 +213,8 @@ export class English extends BaseText {
 						maxHeight = yOffset + sprite.height;
 					}
 				} else {
+					console.log(index, this.sheet.sprites);
+
 					surface.fillRect(
 						x + xOffset,
 						y + yOffset,
@@ -298,6 +300,8 @@ export class English extends BaseText {
 							maxHeight = yOffset + sprite.height;
 						}
 					} else {
+						console.log(index, this.sheet.sprites);
+
 						surface.fillRect(
 							x + xOffset,
 							y + yOffset,
