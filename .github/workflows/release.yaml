@@ -17,6 +17,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             FORCE_COLOR: "1"
+            NPM_CONFIG_DANGEROUSLY_ALLOW_ALL_SCRIPTS: "true"
         steps:
             - name: Turnstyle
               uses: softprops/turnstyle@v1
