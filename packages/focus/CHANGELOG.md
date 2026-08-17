@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.10
+
+### Notes
+
+Updated local dependencies.
+
 ## 1.0.9
 
 ### Chores

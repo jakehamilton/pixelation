@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/animation",
-    "version": "1.1.6",
+    "version": "1.1.7",
     "description": "Animation support for the Pixelation Engine.",
     "type": "module",
     "files": [
@@ -42,7 +42,7 @@
         "typescript": "^5.6.3"
     },
     "dependencies": {
-        "@pixelation/engine": "1.8.5"
+        "@pixelation/engine": "1.8.6"
     },
     "homepage": "https://github.com/jakehamilton/pixelation",
     "repository": {

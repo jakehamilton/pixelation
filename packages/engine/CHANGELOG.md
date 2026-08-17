@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.8.6
+
+### Fixes
+
+- add missing doc comments
+
 ## 1.8.5
 
 ### Chores
