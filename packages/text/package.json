@@ -1,6 +1,6 @@
 {
     "name": "@pixelation/text",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "description": "Text support for the Pixelation Engine.",
     "files": [
         "dist/*",

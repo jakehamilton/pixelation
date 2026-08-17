@@ -1,10 +1,16 @@
 # Change Log
 
+## 1.0.13
+
+### Fixes
+
+-   support colors and all characters on compact font
+
 ## 1.0.12
 
 ### Chores
 
-- update lock files
+-   update lock files
 
 ### Notes
 
@@ -14,7 +20,7 @@ Updated local dependencies.
 
 ### Fixes
 
-- use externals, map umd globals
+-   use externals, map umd globals
 
 ### Notes
 
@@ -24,7 +30,7 @@ Updated local dependencies.
 
 ### Fixes
 
-- _(ci)_: appease npm's broken file matching
+-   _(ci)_: appease npm's broken file matching
 
 ### Notes
 
@@ -58,7 +64,7 @@ Updated local dependencies.
 
 ### Chores
 
-- bump dependencies
+-   bump dependencies
 
 ### Notes
 
@@ -80,17 +86,16 @@ Updated local dependencies.
 
 ### Other
 
-- clean up basic example code
+-   clean up basic example code
 
 ## 1.0.1
 
 ### Fixes
 
-- correct spacing after digits
+-   correct spacing after digits
 
 ## 1.0.0
 
 ### Notes
 
 Created package "@pixelation/text".
-
